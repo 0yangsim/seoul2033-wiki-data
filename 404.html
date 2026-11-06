@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>서울2033 위키 검색</title>
+<style>
+:root{--bg:#f6f6f7;--card:#fff;--line:rgba(128,128,128,.28);--t1:#1d1d1f;--t2:#55585d;--t3:#8a8d93;--acc:#2e7d32;--mark:rgba(255,193,7,.45)}
+@media (prefers-color-scheme:dark){:root{--bg:#141416;--card:#1f2023;--t1:#ececee;--t2:#b4b7bd;--t3:#7f838a;--acc:#66bb6a;--mark:rgba(255,193,7,.35)}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--t1);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 48px}
+header{padding:22px 0 10px}
+h1{font-size:18px;margin:0 0 12px}
+.box{position:relative}
+#q{width:100%;padding:12px 40px 12px 14px;font:inherit;color:var(--t1);background:var(--card);border:1px solid var(--line);border-radius:10px;outline:none;-webkit-appearance:none;appearance:none}
+#q::-webkit-search-cancel-button,#q::-webkit-search-decoration{-webkit-appearance:none;display:none}
+#q::-ms-clear{display:none}
+#q:focus{border-color:var(--acc)}
+#clr{position:absolute;right:0;top:0;width:40px;height:100%;border:0;background:none;color:var(--t3);font-size:15px;cursor:pointer;display:none}
+#clr:hover{color:var(--t1)}
+.label{font-size:11px;letter-spacing:.1em;color:var(--t3);margin:18px 0 6px}
+.row{display:block;width:100%;text-align:left;font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:0 0 8px;cursor:pointer}
+.row:hover{border-color:var(--acc)}
+.row:active{background:rgba(128,128,128,.12)}
+#nbd{background:var(--card);border:1px solid var(--line);border-radius:10px;margin:14px 0 4px;overflow:hidden}
+#nbd>summary{padding:10px 14px;font-size:13px;color:var(--t2);cursor:pointer;list-style:none;user-select:none}
+#nbd>summary::-webkit-details-marker{display:none}
+#nbd>summary::before{content:"▾";display:inline-block;width:1.1em;color:var(--t3)}
+#nbd:not([open])>summary::before{content:"▸"}
+#nbf{display:block;width:100%;border:0;height:0;background:transparent}
+.row .t{font-size:15px}
+.row .s{font-size:12px;color:var(--t2);margin-top:3px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;word-break:break-word}
+mark{background:var(--mark);color:inherit;font-weight:700;border-radius:2px}
+.msg{color:var(--t3);font-size:13px;padding:14px 0;white-space:pre-line}
+footer{margin-top:28px;font-size:11px;color:var(--t3)}
+footer a:hover{text-decoration:underline}
+#fab{position:fixed;right:14px;bottom:18px;z-index:30;display:flex;flex-direction:column;gap:8px}
+#fab button{width:42px;height:42px;border:0;border-radius:50%;background:rgba(70,72,78,.82);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);padding:0}
+#fab button:hover{background:rgba(70,72,78,1)}
+#fab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+@media (prefers-color-scheme:dark){#fab button{background:rgba(255,255,255,.2)}#fab button:hover{background:rgba(255,255,255,.3)}}
+#viewer{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;z-index:10}
+#viewer.on{display:flex}
+#bar{position:absolute;top:0;left:0;right:0;z-index:2;display:flex;align-items:center;gap:4px;height:48px;padding:0 8px;border-bottom:1px solid var(--line);background:var(--card);will-change:transform}
+#bar button,#bar a{border:0;background:none;color:var(--t2);font:inherit;font-size:13px;padding:8px 10px;cursor:pointer;text-decoration:none}
+#bar #back{font-size:20px;width:44px}
+#bar [hidden]{display:none}
+#bar #full{color:var(--acc);font-weight:700}
+#vt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700;font-size:15px}
+#frame{position:absolute;top:0;left:0;width:100%;height:100%;border:0;background:var(--card)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>서울2033 위키 검색</h1>
+    <div class="box">
+      <input id="q" type="text" inputmode="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="게임 문장 일부, 제목, 확장팩 이름">
+      <button id="clr" type="button" aria-label="지우기">✕</button>
+    </div>
+  </header>
+  <details id="nbd" open hidden><summary>서울 2033 › 랜덤 인카운터</summary><iframe id="nbf" title="서울 2033 랜덤 인카운터"></iframe></details>
+  <main id="out"><div class="msg">불러오는 중…</div></main>
+  <footer>내용 출처: <a href="https://namu.wiki/" target="_blank" rel="noopener">나무위키</a> (CC BY-NC-SA 2.0 KR) · 오프라인 사본이며 원문과 다를 수 있습니다.</footer>
+</div>
+
+<div id="fab">
+  <button id="up" type="button" aria-label="맨 위로"><svg viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"/></svg></button>
+  <button id="dn" type="button" aria-label="맨 아래로"><svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></svg></button>
+</div>
+
+<div id="viewer">
+  <div id="bar">
+    <button id="back" type="button" aria-label="뒤로">←</button>
+    <div id="vt"></div>
+    <button id="full" type="button" hidden>전체 보기</button>
+    <a id="web" target="_blank" rel="noopener">나무위키 원문</a>
+  </div>
+  <iframe id="frame" title="문서"></iframe>
+</div>
+
+<script>
+"use strict";
+// ─────────────────────────── 기본 ───────────────────────────
+const WEB = "https://namu.wiki/w/";
+// 사이트 루트 (예: /seoul2033-wiki-data/). 주소가 .../w/문서 형태여도, 첫 화면이어도 같은 값이 나온다.
+const ROOT = (() => { const p = location.pathname, i = p.indexOf("/w/"); return i >= 0 ? p.slice(0, i + 1) : p.replace(/[^/]*$/, ""); })();
+const $ = (id) => document.getElementById(id);
+const out = $("out"), q = $("q");
+let manifest = null, pages = [], entries = [], ready = false, nb = null, inApp = false;
+const docCache = new Map(), cssCache = new Map();
+let foldJs = null;
+
+const LET = /[\p{L}\p{N}]/u;
+// 앱(WikiSearch.kt)과 같은 정규화: 글자·숫자만 남기고 소문자. UTF-16 단위로 처리해서 길이 대응이 앱과 같다.
+function norm(s) { let r = ""; for (let i = 0; i < s.length; i++) { const c = s[i]; if (LET.test(c)) r += c.toLowerCase(); } return r; }
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function short(t) { return t.slice(t.lastIndexOf("/") + 1); }
+// 아주 긴 목록 문서: 앵커로 들어오면(검색 결과·문서 안 링크) 해당 부분만 보여 주고, 위쪽 '전체 보기'를 누르면 문서 전체(기존 링크 모양)로 본다.
+//   값 = 가장 큰 제목(최상위)에서 몇 단계 아래 제목까지 올라가서 그 제목과 하위 섹션을 한 묶음으로 볼지.
+//   0 = 누른 섹션과 그 하위 섹션만 / 1 = 최상위 바로 아래 단계(=한 이야기) 전체
+const PART_DOCS = { "기본 인카운터": 0, "이야기 인카운터": 1 };
+const isPartDoc = (t) => Object.prototype.hasOwnProperty.call(PART_DOCS, short(t));
+function wikiUrl(title, anchor) {
+  const b = WEB + encodeURIComponent(title);
+  return anchor ? b + "#" + encodeURIComponent(anchor) : b;
+}
+
+async function getBytes(url) {
+  const r = await fetch(url, { cache: "no-cache" });
+  if (!r.ok) throw new Error("HTTP " + r.status + " " + url);
+  return new Uint8Array(await r.arrayBuffer());
+}
+async function gunzipJson(bytes) {
+  if (typeof DecompressionStream === "undefined") throw new Error("이 브라우저는 gzip 해제를 지원하지 않습니다. 최신 브라우저를 사용해 주세요.");
+  const s = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return JSON.parse(await new Response(s).text());
+}
+
+// ─────────────────────────── 데이터 로딩 ───────────────────────────
+async function init() {
+  try {
+    manifest = JSON.parse(new TextDecoder().decode(await getBytes(ROOT + "manifest.json")));
+    const idx = await gunzipJson(await getBytes(ROOT + "assets/search.json.gz"));
+    pages = idx.pages;
+    entries = idx.e.map((a) => ({ page: a[0], sec: a[1], title: a[2], number: a[3], text: a[4], nTitle: norm(a[2]), nText: norm(a[4]) }));
+    ready = true;
+    try { nb = await gunzipJson(await getBytes(ROOT + "assets/navbox.json.gz")); } catch (e) { nb = null; }   // 틀은 없어도 동작
+  } catch (e) {
+    out.innerHTML = '<div class="msg">데이터를 불러오지 못했습니다.\n' + esc(String(e.message || e)) + "</div>";
+    return;
+  }
+  route();
+}
+
+// ─────────────────────────── 검색 (앱 WikiSearch.kt 와 같은 규칙) ───────────────────────────
+function docHits(qn) {
+  if (qn.length < 2) return [];
+  const found = [];
+  pages.forEach((p, i) => {
+    const n = norm(short(p));
+    if (n === qn) found.push([100, i]); else if (n.startsWith(qn)) found.push([90, i]); else if (n.includes(qn)) found.push([80, i]);
+  });
+  found.sort((a, b) => b[0] - a[0] || a[1] - b[1]);
+  return found.slice(0, 8).map((x) => pages[x[1]]);
+}
+function shingles(qn) {
+  if (qn.length < 25) return [];
+  const w = 12, n = 12, step = Math.max(1, Math.floor((qn.length - w) / (n - 1)));
+  const o = new Set();
+  for (let i = 0; i + w <= qn.length && o.size < n; i += step) o.add(qn.substr(i, w));
+  return [...o];
+}
+function score(e, qn, sh) {
+  let best = 0, pos = -1, len = 0;
+  const nt = e.nTitle;
+  if (nt) {
+    if (nt === qn) best = 100; else if (qn.length >= 2 && nt.startsWith(qn)) best = 90; else if (qn.length >= 2 && nt.includes(qn)) best = 80;
+  }
+  if (qn.length >= 3 && e.nText) {
+    const p = e.nText.indexOf(qn);
+    if (p >= 0) {
+      const s = 70 + 10 * Math.min(1, qn.length / Math.max(e.nText.length, 1));
+      if (s > best) { best = s; pos = p; len = qn.length; }
+    }
+  }
+  if (sh.length && e.nText) {
+    let h = 0, firstAt = -1, firstLen = 0;
+    for (const x of sh) { const p = e.nText.indexOf(x); if (p >= 0) { h++; if (firstAt < 0) { firstAt = p; firstLen = x.length; } } }
+    if (h >= Math.max(2, Math.floor(sh.length / 3))) {
+      const s = 60 + 30 * h / sh.length;
+      if (s > best) { best = s; pos = firstAt; len = firstLen; }
+    }
+  }
+  return { score: best, e, pos, len };
+}
+function search(query, limit = 50) {
+  const qn = norm(query);
+  if (!qn) return { docs: [], hits: [] };
+  const docs = docHits(qn), sh = shingles(qn);
+  let scored = [];
+  for (const e of entries) { const s = score(e, qn, sh); if (s.score > 0) scored.push(s); }
+  if (!scored.length) {
+    const toks = [...new Set(query.split(/\s+/).map(norm).filter((t) => t.length >= 2))];
+    if (toks.length >= 2) {
+      for (const e of entries) {
+        // 문서 이름도 같이 본다: "문서명 본문 일부"처럼 띄어 쓴 검색어도 찾아지게 (색인의 섹션 항목에는 문서 이름이 없다)
+        const head = norm(short(pages[e.page])) + " " + e.nTitle, hay = head + " " + e.nText;
+        if (toks.every((t) => hay.includes(t))) {
+          const inTitle = toks.every((t) => head.includes(t));
+          scored.push({ score: inTitle ? 60 : 55, e, pos: e.nText.indexOf(toks[0]), len: toks[0].length });
+        }
+      }
+    }
+  }
+  if (!scored.length && qn.length >= 3) {
+    const bi = (s) => { const r = new Set(); for (let i = 0; i + 2 <= s.length; i++) r.add(s.substr(i, 2)); return r; };
+    const qb = bi(qn);
+    for (const e of entries) {
+      const tb = bi(e.nTitle); if (!tb.size) continue;
+      let inter = 0; for (const x of qb) if (tb.has(x)) inter++;
+      const sim = 2 * inter / (qb.size + tb.size);
+      if (sim >= 0.5) scored.push({ score: 40 * sim, e, pos: -1, len: 0 });
+    }
+  }
+  scored.sort((a, b) => b.score - a.score || a.e.page - b.e.page || a.e.sec - b.e.sec);
+  return { docs, hits: scored.slice(0, limit) };
+}
+function origIndex(text, normPos) {
+  let c = 0;
+  for (let i = 0; i < text.length; i++) if (LET.test(text[i])) { if (c === normPos) return i; c++; }
+  return text.length;
+}
+function snippet(e, pos, len) {
+  const t = e.text;
+  if (pos < 0 || len <= 0 || !t) return esc(t.slice(0, 90));
+  const os = origIndex(t, pos), oe = Math.min(t.length, origIndex(t, pos + len - 1) + 1);
+  const from = Math.max(0, os - 40), to = Math.min(t.length, oe + 60);
+  return (from > 0 ? "…" : "") + esc(t.slice(from, os)) + "<mark>" + esc(t.slice(os, Math.min(oe, to))) + "</mark>" + esc(t.slice(Math.min(oe, to), to)) + (to < t.length ? "…" : "");
+}
+
+// ─────────────────────────── 목록/결과 화면 ───────────────────────────
+function rowHtml(title, subHtml, href) {
+  return '<a class="row" href="' + href + '"><div class="t">' + esc(title) + "</div>" + (subHtml ? '<div class="s">' + subHtml + "</div>" : "") + "</a>";
+}
+// ───── 주소: <루트>w/<문서 제목>#<앵커>  (나무위키와 같은 모양) ─────
+const encPath = (t) => t.split("/").map(encodeURIComponent).join("/");
+// 부분 보기 문서에 앵커가 붙은 링크는 ?view=part (full=true 면 예전처럼 문서 전체 + 앵커 위치)
+function pageHref(title, frag, full) { return ROOT + "w/" + encPath(title) + (frag && !full && isPartDoc(title) ? "?view=part" : "") + (frag ? "#" + frag : ""); }
+const normSegs = (s) => s.split("/").map(norm).filter(Boolean);
+// 입력한 경로(공백·앞쪽 '서울 2033/' 생략 가능)를 받아 둔 문서 제목으로. 예) 랜덤인카운터/기본인카운터
+function resolveTitle(p) {
+  if (manifest.docs[p]) return p;
+  const ps = normSegs(p); if (!ps.length) return null;
+  let best = null;
+  for (const t of Object.keys(manifest.docs)) {
+    const ts = normSegs(t);
+    if (ts.length < ps.length) continue;
+    const tail = ts.slice(ts.length - ps.length);
+    if (tail.every((x, i) => x === ps[i]) && (!best || t.length < best.length)) best = t;
+  }
+  return best;
+}
+const stripParen = (s) => s.replace(/\s*[(（][^()（）]*[)）]\s*$/, "");
+// 앵커 → [섹션 번호, 본문 안 id 또는 null]  (앱 WikiData.resolve 와 같은 순서 + 나무위키식 #s-3.1)
+function resolveAnchor(doc, a) {
+  if (!a) return null;
+  const secs = doc.sections;
+  if (/^s-/i.test(a)) { const i = secs.findIndex((s) => s.anchor === a || "s-" + s.number === a); if (i >= 0) return [i, null]; }
+  for (const k of new Set([norm(a), norm(stripParen(a))])) {
+    if (!k) continue;
+    if (doc.index && doc.index[k]) return [doc.index[k][0], null];
+    if (doc.anchors && doc.anchors[k]) return [doc.anchors[k][0], doc.anchors[k][1]];
+    if (doc.index2 && doc.index2[k]) return [doc.index2[k][0], null];
+  }
+  return null;
+}
+// 문서 안/틀 안의 나무위키 링크 → 이 사이트 안의 같은 문서로. 받아 둔 문서가 아니면 그대로 둔다(나무위키 새 탭).
+//  · 문서 하위 문서(예: 기본 인카운터/튜토리얼)는 상위 문서의 같은 이름 섹션으로 연결
+function siteTarget(t, frag) {
+  const abs = (u) => location.origin + u;           // iframe(srcdoc) 안에서도 이 사이트 주소로 가도록 절대 주소로
+  if (manifest.docs[t]) return abs(pageHref(t, frag));
+  const i = t.lastIndexOf("/");
+  if (i > 0 && manifest.docs[t.slice(0, i)]) return abs(pageHref(t.slice(0, i), frag || encodeURIComponent(t.slice(i + 1))));
+  return null;
+}
+function rewriteLinks(s) {
+  return s.replace(/href="(?:https:\/\/namu\.wiki)?\/w\/([^"#]*)(#[^"]*)?"/g, (m, enc, frag) => {
+    let t; try { t = decodeURIComponent(enc.replace(/&amp;/g, "&")); } catch (e) { return m; }
+    const to = siteTarget(t, frag ? frag.slice(1) : "");
+    return to ? 'href="' + to + '" data-site="1" target="_top"' : m;
+  });
+}
+// 사이트 안 링크를 눌렀을 때 전체 새로고침 없이 이동 (iframe 안에서도 같은 함수를 쓴다)
+const SITE_CLICK = '<script>document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a[data-site]");' +
+  'if(a&&parent.__go&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey){e.preventDefault();parent.__go(a.getAttribute("href"));}});<\/script>';
+// 목차/#앵커 이동을 브라우저 기록에 남겨서, 뒤로가기를 누르면 누르기 전 위치로 돌아오게 한다 (나무위키와 같은 동작).
+// fold.js 가 #앵커 클릭을 가로채 replaceState 만 부르는데(srcdoc 안이라 무시됨) 그 앞(capture)에서 먼저 기록한다. URL 인자 없이 상태만 쌓는다.
+const HIST_JS = '<script>(function(){try{history.scrollRestoration="manual"}catch(e){}' +
+  'function y(){return window.pageYOffset||document.documentElement.scrollTop||0}' +
+  'document.addEventListener("click",function(e){if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.shiftKey||e.button)return;' +
+  'var a=e.target.closest&&e.target.closest("a[href^=\\"#\\"]");if(!a||(a.id&&/^s-/.test(a.id)))return;' +  // 제목의 번호 링크는 접기/펼치기
+  'var id=a.getAttribute("href").slice(1);if(!id||/^(fn-|rfn-)/.test(id))return;' +                           // 각주는 팝업
+  'try{id=decodeURIComponent(id)}catch(x){}if(!(/^s-/.test(id)||document.getElementById(id)))return;' +
+  'try{history.replaceState({ys:y()},"");history.pushState({id:id},"")}catch(x){}},true);' +
+  'addEventListener("popstate",function(e){var s=e.state;if(!s)return;if(s.ys!=null)scrollTo(0,s.ys);' +
+  'else if(s.id){var t=document.getElementById(s.id);if(t)t.scrollIntoView()}});})();<\/script>';
+function go(url) { inApp = true; history.pushState(null, "", url); route(); }
+window.__go = go;
+document.addEventListener("click", (e) => {
+  const a = e.target.closest && e.target.closest("a.row");
+  if (a && e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey) { e.preventDefault(); go(a.getAttribute("href")); }
+});
+
+// ───── 틀:서울 2033/랜덤 인카운터 (첫 화면과 각 문서 맨 위) ─────
+const isDark = () => matchMedia("(prefers-color-scheme: dark)").matches;
+function navHtml(dark) {
+  let body = rewriteLinks(nb.html);
+  const wrap = nb.wrap || [];
+  for (let i = wrap.length - 1; i >= 0; i--) {
+    const w = wrap[i], cls = (w.class || []).concat(["app-wrap"]).join(" ");
+    body = '<div class="' + cls + '"' + Object.keys(w.attrs || {}).map((k) => " " + k).join("") + ">" + body + "</div>";
+  }
+  const bc = (nb.body_class || []).filter((c) => c !== "theseed-light-mode" && c !== "theseed-dark-mode");
+  bc.push(dark ? "theseed-dark-mode" : "theseed-light-mode");
+  return '<div class="nb-root ' + bc.join(" ") + '">' + body + "</div>";
+}
+const NB_CSS = ".app-wrap{margin:0!important;padding:0!important;max-width:none!important;width:auto!important}" +
+  ".nb-root [style*='width:900px']{width:auto!important;max-width:100%!important}.nb-root table{max-width:100%}";
+let nbHome = false;
+async function renderHomeNavbox() {
+  const box = $("nbd");
+  if (!nb) { box.hidden = true; return; }
+  box.hidden = !!q.value.trim();
+  if (nbHome) return;
+  nbHome = true;
+  const dark = isDark(), css = await loadCss(nb.css), f = $("nbf");
+  f.onload = () => {
+    const w = f.contentWindow, d = f.contentDocument;
+    // scrollHeight 는 iframe 자기 높이보다 작아지지 않아 접어도 안 줄어든다 → 내용(html 요소)의 실제 높이를 잰다
+    const fit = () => { f.style.height = Math.ceil(d.documentElement.getBoundingClientRect().height) + "px"; };
+    fit(); new w.ResizeObserver(fit).observe(d.documentElement);
+  };
+  f.srcdoc = '<!doctype html><html style="color-scheme:' + (dark ? "dark" : "light") + '"><head><meta charset="utf-8"><base target="_blank"><style>' + css +
+    "</style><style>html,body{margin:0;padding:0;background:transparent}body{padding:2px 6px 8px;overflow-x:auto}img{max-width:100%;height:auto}" + NB_CSS + "</style></head><body>" +
+    navHtml(dark) + SITE_CLICK + "</body></html>";
+}
+
+function showBrowse() {
+  const docs = Object.keys(manifest.docs);
+  const kinds = ["기본 인카운터", "액티브 인카운터", "하드 모드", "주요 스토리 인카운터", "이야기 인카운터", "레벨 인카운터", "시즌 패스 인카운터"];
+  const byName = new Map(docs.map((d) => [short(d), d]));
+  const fixed = kinds.map((k) => byName.get(k)).filter(Boolean);
+  const exp = docs.filter((d) => !kinds.includes(short(d))).sort((a, b) => short(a).localeCompare(short(b), "ko"));
+  const rows = (arr) => arr.map((d) => rowHtml(short(d), "섹션 " + manifest.docs[d].sections + "개", pageHref(d))).join("");
+  out.innerHTML = '<div class="label">인카운터 (' + fixed.length + ")</div>" + rows(fixed) + '<div class="label">확장팩 (' + exp.length + ")</div>" + rows(exp);
+  renderHomeNavbox();
+}
+function showResults(r) {
+  $("nbd").hidden = true;
+  if (!r.docs.length && !r.hits.length) { out.innerHTML = '<div class="msg">일치하는 항목이 없습니다.</div>'; return; }
+  let h = "";
+  if (r.docs.length) h += '<div class="label">문서 (' + r.docs.length + ")</div>" + r.docs.map((p) => rowHtml(short(p), "문서 전체 보기", pageHref(p))).join("");
+  if (r.hits.length) {
+    h += '<div class="label">항목 (' + r.hits.length + ")</div>";
+    for (const s of r.hits) {
+      const e = s.e, name = short(pages[e.page]);
+      h += rowHtml(e.number ? name + " › " + e.number + ". " + e.title : name + " › " + e.title, snippet(e, s.pos, s.len), pageHref(pages[e.page], e.number ? "s-" + e.number : encodeURIComponent(e.title)));
+    }
+  }
+  out.innerHTML = h;
+}
+
+let timer = 0;
+q.addEventListener("input", () => {
+  $("clr").style.display = q.value ? "block" : "none";
+  clearTimeout(timer);
+  timer = setTimeout(() => { if (!ready) return; const v = q.value; if (!v.trim()) showBrowse(); else showResults(search(v)); }, 200);
+});
+$("clr").addEventListener("click", () => { q.value = ""; q.dispatchEvent(new Event("input")); q.focus(); });
+
+// ─────────────────────────── 문서 보기 (앱 WikiData.renderDoc 과 같은 구조) ───────────────────────────
+async function loadDoc(title) {
+  if (docCache.has(title)) return docCache.get(title);
+  const m = manifest.docs[title]; if (!m) throw new Error("문서를 찾을 수 없습니다: " + title);
+  const d = await gunzipJson(await getBytes(ROOT + m.path));
+  docCache.set(title, d);
+  return d;
+}
+async function loadCss(id) {
+  if (cssCache.has(id)) return cssCache.get(id);
+  let css = new TextDecoder().decode(await getBytes(ROOT + "assets/namu." + id + ".css"));
+  const font = new URL(ROOT + "assets/fonts/ionicons.woff2", location.origin).href;     // srcdoc 안에서는 상대 경로가 안 먹으므로 절대 주소로
+  css = css.split('url("fonts/ionicons.woff2")').join('url("' + font + '")');
+  cssCache.set(id, css);
+  return css;
+}
+async function loadFold() {
+  if (foldJs == null) foldJs = new TextDecoder().decode(await getBytes(ROOT + "assets/fold.js"));
+  return foldJs;
+}
+async function buildDocHtml(title, anchor, part) {
+  const [doc, fold] = [await loadDoc(title), await loadFold()];
+  const css = await loadCss(doc.css);
+  const nbCss = nb && nb.css !== doc.css ? await loadCss(nb.css) : "";
+  const dark = isDark();
+  let inner = "", toc = "", tocCount = 0;
+  const hit = resolveAnchor(doc, anchor), sec = hit ? hit[0] : null;
+  let lo = 0, hi = doc.sections.length - 1, partMode = false;
+  if (part && hit && isPartDoc(title)) {
+    const secs = doc.sections, up = PART_DOCS[short(title)], lim = Math.min(...secs.map((s) => s.level || 1)) + up;
+    let r = hit[0];
+    while (up > 0 && r > 0 && (secs[r].level || 1) > lim) r--;          // 묶음의 맨 위 제목까지 올라간다 (up=0 이면 누른 섹션 그대로)
+    lo = r; hi = Math.min(secs.length - 1, r + (secs[r].span || 0)); partMode = true;
+  }
+  doc.sections.forEach((s, i) => {
+    if (i < lo || i > hi) return;
+    const level = s.level || 1;
+    inner += '<div class="fold-h" id="sec-' + i + '" data-level="' + level + '">' + rewriteLinks(s.heading || "") + '</div><div class="fold-b">' + rewriteLinks(s.html || "") + "</div>";
+    if (s.title) {
+      toc += '<a class="app-toc-item" href="#sec-' + i + '" style="padding-left:' + Math.max(0, level - 2) * 12 + 'px">' + (s.number ? esc(s.number) + ". " : "") + esc(s.title) + "</a>";
+      tocCount++;
+    }
+  });
+  let body = inner;
+  const wrap = doc.wrap || [];
+  for (let i = wrap.length - 1; i >= 0; i--) {
+    const w = wrap[i], cls = (w.class || []).concat(["app-wrap"]).join(" ");
+    const attrs = Object.keys(w.attrs || {}).map((k) => " " + k).join("");
+    body = '<div class="' + cls + '"' + attrs + ">" + body + "</div>";
+  }
+  const bc = (doc.body_class || []).filter((c) => c !== "theseed-light-mode" && c !== "theseed-dark-mode");
+  bc.push(dark ? "theseed-dark-mode" : "theseed-light-mode");
+  const cls = bc.join(" ");
+  const pageName = short(title);
+  const secTitle = sec != null && doc.sections[sec] ? doc.sections[sec].title : null;
+  let html = '<!doctype html><html style="color-scheme:' + (dark ? "dark" : "light") + '"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1"><base target="_blank">' +
+    "<style>" + css + "</style><style>" +
+    "html,body{margin:0;padding:0}body{padding:54px 8px 6px;word-break:break-word;background:" + (dark ? "#1b1b1d" : "#fff") + ";color:" + (dark ? "#e0e0e0" : "#373a3c") + "}" +
+    "img{max-width:100%;height:auto}.app-wrap{margin:0!important;padding:0!important;max-width:none!important;width:auto!important}" +
+    ".fold-h:first-child,.fold-h:first-child *{margin-top:0!important}.app-title{font-size:1.2em;font-weight:700;margin:0 0 6px}" +
+    ".app-toc{margin:0 0 10px;border:1px solid rgba(128,128,128,.4);border-radius:8px;padding:2px 10px;font-size:13px}.app-toc summary{padding:6px 0;cursor:pointer}" +
+    ".app-toc-list{padding-bottom:6px}.app-toc-item{display:block;padding:4px 0;color:inherit!important;text-decoration:none!important;opacity:.85}" +
+    (nbCss ? "</style><style>" + nbCss : "") + "</style><style>" + NB_CSS + '.nb-root{margin:0 0 10px;overflow-x:auto}' +
+    '</style></head><body class="' + cls + '"><div class="app-title">' + esc(pageName) + "</div>" +
+    (partMode ? '<div style="font-size:12px;opacity:.7;margin:0 0 8px">선택한 부분만 보는 중 · 위쪽 \'전체 보기\'를 누르면 문서 전체</div>' : "") + (nb ? navHtml(dark) : "");
+  if (tocCount) html += '<details class="app-toc"' + (tocCount <= 60 ? " open" : "") + "><summary>목차 · " + tocCount + '개</summary><div class="app-toc-list">' + toc + "</div></details>";
+  html += '<div id="app"><div class="' + cls + '">' + body + "</div></div>" +
+    '<div style="font-size:11px;opacity:.7;margin:16px 0 8px">출처: <a href="' + esc(wikiUrl(title, secTitle)) + '">나무위키</a> (CC BY-NC-SA 2.0 KR) · 오프라인 사본</div>' +
+    SITE_CLICK +
+    "<script>(function(){var r=history.replaceState;history.replaceState=function(s,t,u){if(u!=null)return;try{return r.call(history,s,t)}catch(e){}}})()<\/script>" +
+    HIST_JS +
+    "<script>" + fold.replace(/<\/script/gi, "<\\/script") + "<\/script>";
+  if (hit) html += "<script>(function(){var t=document.getElementById(" + JSON.stringify(hit[1] || "sec-" + sec).replace(/</g, "\\u003c") + ")||document.getElementById('sec-" + sec + "'),u=false;if(!t)return;" +
+      "['wheel','touchmove','keydown'].forEach(function(n){addEventListener(n,function(){u=true;},{passive:true});});" +
+      "t.scrollIntoView();addEventListener('load',function(){if(!u)t.scrollIntoView();});})();<\/script>";
+  html += "</body></html>";
+  // 문서 안의 사이트 내 링크(/w/…)는 나무위키 원문으로 연결
+  html = html.replace(/(\shref=["'])\/(?!\/)/g, "$1https://namu.wiki/");
+  return { html, secTitle, pageName, partMode };
+}
+async function openDoc(title, anchor, part) {
+  $("viewer").classList.add("on");
+  document.body.style.overflow = "hidden";
+  setBar(0, false);
+  $("full").hidden = true;
+  $("vt").textContent = short(title);
+  $("frame").srcdoc = "";
+  try {
+    const r = await buildDocHtml(title, anchor, part);
+    document.title = (r.secTitle ? r.pageName + " › " + r.secTitle : r.pageName) + " · 서울2033 위키";
+    $("vt").textContent = r.secTitle ? r.pageName + " › " + r.secTitle : r.pageName;
+    $("web").href = wikiUrl(title, r.secTitle);
+    $("full").hidden = !r.partMode;
+    $("full").onclick = () => go(pageHref(title, anchor ? encodeURIComponent(anchor) : "", true));
+    $("frame").srcdoc = r.html;
+  } catch (e) {
+    $("frame").srcdoc = '<p style="font:14px sans-serif;padding:16px">문서를 불러오지 못했습니다.<br>' + esc(String(e.message || e)) + "</p>";
+  }
+}
+// 위쪽 바: 아래로 스크롤하면 스크롤한 만큼 같이 밀려 올라가고, 위로 스크롤하면 그만큼 다시 내려온다. 멈췄을 때 반쯤 걸쳐 있으면 부드럽게 마저 이동.
+let barOff = 0, barLast = 0, barTimer = 0;
+function setBar(v, anim) {
+  const bar = $("bar");
+  barOff = v;
+  bar.style.transition = anim ? "transform .18s ease-out" : "none";
+  bar.style.transform = v ? "translateY(" + (-v) + "px)" : "";
+}
+$("frame").addEventListener("load", () => {
+  let w; try { w = $("frame").contentWindow; w.document; } catch (e) { return; }
+  const H = () => $("bar").offsetHeight + 1;                   // +1 = 아래 테두리선까지 가린다
+  barLast = w.pageYOffset; setBar(0, false);
+  w.addEventListener("scroll", () => {
+    const y = Math.max(0, w.pageYOffset), d = y - barLast;
+    barLast = y;
+    if (y <= 0) setBar(0, false); else setBar(Math.min(H(), Math.max(0, barOff + d)), false);
+    clearTimeout(barTimer);
+    barTimer = setTimeout(() => { if (barOff > 0 && barOff < H()) setBar(barOff > H() / 2 ? H() : 0, true); }, 140);
+  }, { passive: true });
+});
+function closeDoc() { $("viewer").classList.remove("on"); document.body.style.overflow = ""; $("frame").srcdoc = ""; }
+$("back").addEventListener("click", () => {
+  if (!$("viewer").classList.contains("on")) return;
+  if (inApp) history.back();                                   // 이 사이트 안에서 열었으면 이전 화면으로
+  else { history.replaceState(null, "", ROOT); route(); }      // 공유 링크로 바로 들어왔으면 첫 화면으로
+});
+// 맨 위로 / 맨 아래로 (문서를 보는 중이면 문서 안, 아니면 첫 화면)
+function scrollEdge(top) {
+  let w = window;
+  if ($("viewer").classList.contains("on")) { try { w = $("frame").contentWindow; } catch (e) {} }
+  const h = w.document.documentElement.scrollHeight;
+  w.scrollTo({ top: top ? 0 : h, behavior: "auto" });
+}
+$("up").addEventListener("click", () => scrollEdge(true));
+$("dn").addEventListener("click", () => scrollEdge(false));
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && $("viewer").classList.contains("on")) $("back").click(); });
+
+// 주소로 화면 전환: <루트>w/<문서>#<앵커> = 문서, 그 외 = 첫 화면 (옛 #d=<문서> 주소도 받아 준다)
+function route() {
+  if (!ready) return;
+  const i = location.pathname.indexOf("/w/");
+  let path = null, anchor = "";
+  if (i >= 0) {
+    try { path = decodeURIComponent(location.pathname.slice(i + 3)); } catch (e) { path = location.pathname.slice(i + 3); }
+    try { anchor = decodeURIComponent(location.hash.slice(1)); } catch (e) { anchor = location.hash.slice(1); }
+  } else if (location.hash.startsWith("#d=")) {
+    path = new URLSearchParams(location.hash.slice(1)).get("d");
+  }
+  const title = path ? resolveTitle(path.replace(/\/+$/, "")) : null;
+  if (title) {
+    const part = /[?&]view=part(&|$)/.test(location.search) && isPartDoc(title);
+    const canonical = pageHref(title, anchor ? encodeURIComponent(anchor) : "", !part);
+    if (location.pathname + location.search + location.hash !== canonical) history.replaceState(null, "", canonical);   // 줄여 쓴 주소는 정식 주소로 바꿔 둔다
+    openDoc(title, anchor, part);
+  } else {
+    if (path) history.replaceState(null, "", ROOT);            // 없는 문서 주소는 첫 화면으로
+    closeDoc(); document.title = "서울2033 위키 검색";
+    if (!out.innerHTML || out.querySelector(".msg")) { q.value.trim() ? showResults(search(q.value)) : showBrowse(); }
+  }
+}
+addEventListener("popstate", route);
+init();
+</script>
+</body>
+</html>
